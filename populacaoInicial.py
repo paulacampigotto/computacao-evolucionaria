@@ -44,12 +44,12 @@ def popInteira():
 def popInteiraPerm():
     populacao = []
     for i in range(POP):
+        vetor = [j for j in range(DIM)]
         cromossomo = []
-        for i in range(DIM):
-            aux = random.randint(0,DIM-1)
-            while(aux in cromossomo):
-                aux = random.randint(0,DIM-1)
-            cromossomo.append(aux)
+        for j in range(DIM):
+            rand = random.choice(vetor)
+            cromossomo.append(rand)
+            vetor.remove(rand)
         populacao.append(cromossomo)
     return populacao
 
