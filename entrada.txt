@@ -1,0 +1,4 @@
+COD=INT-PERM
+POP=10
+DIM=10
+Bounds=[-5,5]
