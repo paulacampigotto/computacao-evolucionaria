@@ -1,6 +1,5 @@
 from pprint import pprint
 import random
-import sys
 
 COD = ''
 POP = 0
