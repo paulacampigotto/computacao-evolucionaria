@@ -1,5 +1,5 @@
 from pprint import pprint
-import random
+from random import randint, uniform, choice
 
 COD = ''
 POP = 0
@@ -9,12 +9,11 @@ Ui=0
 
 def leitura():
     global COD, POP, DIM, Li, Ui
-    with open('entrada.txt', 'r') as f:
-        linhas = f.readlines()
+    f = open('entrada.txt', 'r')
+    linhas = f.readlines()
 
     for i in range(len(linhas)):
-        aux = linhas[i].split("\n")
-        linhas[i] = aux[0]
+        linhas[i] = linhas[i].split("\n")[0]
 
     COD = linhas[0].split("=")[1]
     POP = (int)(linhas[1].split("=")[1])
@@ -28,7 +27,7 @@ def popBinaria():
     for i in range(POP):
         cromossomo = []
         for i in range(DIM):
-            cromossomo.append(random.randint(0,1))
+            cromossomo.append(randint(0,1))
         populacao.append(cromossomo)
     return populacao
 
@@ -37,7 +36,7 @@ def popInteira():
     for i in range(POP):
         cromossomo = []
         for i in range(DIM):
-            cromossomo.append(random.randint(Li,Ui))
+            cromossomo.append(randint(Li,Ui))
         populacao.append(cromossomo)
     return populacao
 
@@ -47,7 +46,7 @@ def popInteiraPerm():
         vetor = [j for j in range(DIM)]
         cromossomo = []
         for j in range(DIM):
-            rand = random.choice(vetor)
+            rand = choice(vetor)
             cromossomo.append(rand)
             vetor.remove(rand)
         populacao.append(cromossomo)
@@ -58,18 +57,43 @@ def popReal():
     for i in range(POP):
         cromossomo = []
         for i in range(DIM):
-            cromossomo.append(round(random.uniform(Li, Ui), 2))
+            cromossomo.append(round(uniform(Li, Ui), 2))
         populacao.append(cromossomo)
     return populacao
 
+def fitness(vetor):
+    colisoes = 0
+    for i in range(DIM):
+        for k in range(i+1,DIM):
+            if k-i == vetor[k]-vetor[i] or i-k == vetor[k]-vetor[i]:
+                colisoes += 1
+    return DIM - colisoes
+
+def tabuleiro(vetor):
+    for i in range(DIM):
+        print('*\t'*vetor[i],end='0\t')
+        print('*\t'*(DIM-1-vetor[i]))
+        print()
 
 leitura()
 
 if(COD == 'BIN'):
-    pprint(popBinaria())
+    populacao = popBinaria()
 elif(COD == 'INT'):
-    pprint(popInteira())
+    populacao = popInteira()
 elif(COD == 'REAL'):
-    pprint(popReal())
+    populacao = popReal()
 else:
-    pprint(popInteiraPerm())
+    populacao = popInteiraPerm()
+
+populacao.sort(key=fitness)
+(pior, melhor) = (populacao[0], populacao[-1])
+
+pprint(populacao)
+
+print('Pior indivíduo:')
+tabuleiro(pior)
+print('Fitness:' + str(fitness(pior)))
+print('Melhor indivíduo:')
+tabuleiro(melhor)
+print('Fitness:' + str(fitness(melhor)))
