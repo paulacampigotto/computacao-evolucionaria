@@ -1,7 +1,6 @@
 from pprint import pprint
-from random import randint, uniform, choice, random
-import itertools
-from math import ceil, cos
+from random import uniform, random
+from math import cos
 
 ## GLOBAIS
 tam_populacao = 10
