@@ -90,7 +90,6 @@ populacao.sort(key=fitness)
 (pior, melhor) = (populacao[0], populacao[-1])
 
 pprint(populacao)
-
 print('Pior indivíduo:')
 tabuleiro(pior)
 print('Fitness:' + str(fitness(pior)))
