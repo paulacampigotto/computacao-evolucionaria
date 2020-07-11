@@ -6,7 +6,9 @@ from math import ceil, cos
 ## GLOBAIS
 tam_populacao = 10
 tam_cromossomo = 17
-
+Li = -2
+Ui = 2
+casas_decimais = 4
 
 def float_to_binary(x, m, n):
     x_scaled = round(x * 2 ** n)
@@ -36,7 +38,7 @@ def lista_string(lista):
 def populacao_inicial():
     populacao = []
     for i in range(tam_populacao):
-        valor = round(uniform(-2,2),4)
+        valor = round(uniform(Li,Ui),casas_decimais)
         valor_binario = string_lista(float_to_binary(valor, 2, 13))
         populacao.append(valor_binario)
     return populacao
@@ -44,7 +46,7 @@ def populacao_inicial():
 
 def fitness(individuo):
     individuo_string = lista_string(individuo)
-    x = round(binary_to_float(individuo_string, 2, 13),4)
+    x = round(binary_to_float(individuo_string, 2, 13),casas_decimais)
     return cos(20*x) - (abs(x)/2) + (x*x*x/4)
 
 def main():
@@ -56,14 +58,12 @@ def main():
 
     print('População:')
     pprint(populacao)
-    print('\nMinimização: \nIndivíduo: ' + lista_string(minimo) + ' ou ' + str(round(binary_to_float(lista_string(minimo),2, 13),4)) + '\nFitness: ' + str(fitness(minimo)))
-    print('\nMaximização: \nIndivíduo: ' + lista_string(maximo) + ' ou ' + str(round(binary_to_float(lista_string(maximo),2, 13),4)) + '\nFitness: ' + str(fitness(maximo)))
-
+    print('\nMinimização:')
+    print('Indivíduo: ' + lista_string(minimo)+ ' ou ' + str(round(binary_to_float(lista_string(minimo),2, 13),casas_decimais)))
+    print('Fitness: ' + str(fitness(minimo))) 
+    print('\nMaximização:')
+    print('Indivíduo: ' + lista_string(maximo)+ ' ou ' + str(round(binary_to_float(lista_string(maximo),2, 13),casas_decimais)))
+    print('Fitness: ' + str(fitness(maximo))) 
 
 if __name__ == "__main__":
     main()
-
-
-    
-# b = binary_to_float(a, 2, 13)
-# print(round(b,4))
