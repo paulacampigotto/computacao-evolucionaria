@@ -9,7 +9,6 @@ tam_cromossomo = 16
 Li = -20000
 Ui = 20000
 L = 16
-casas_decimais = 4
 
 
 def lista_string(lista):
@@ -19,7 +18,7 @@ def lista_string(lista):
     return string
 
 def mapeia_d_x(d):
-    return Li + ((Ui - Li)/(pow(2,16)-1))*d
+    return (Li + ((Ui - Li)/(pow(2,16)-1))*d)/10000
 
 def converte_bin_dec(lista_bin):
     binario = ''
@@ -41,14 +40,12 @@ def populacao_inicial():
 
 def fitness(individuo):
     decimal = converte_bin_dec(individuo)
-    x = mapeia_d_x(decimal)/10000
+    x = mapeia_d_x(decimal)
     return cos(20*x) - (abs(x)/2) + (x*x*x/4)
 
 def main():
 
     populacao = populacao_inicial()
-
-    converte_bin_dec(populacao[0])
 
     populacao.sort(key=fitness)
     (minimo, maximo) = (populacao[0], populacao[-1])
@@ -59,14 +56,14 @@ def main():
     print('Indivíduo:')
     print('- Binário: ' + str(lista_string(minimo)))
     print('- Decimal: ' + str(converte_bin_dec(lista_string(minimo))/10000))
-    print('- X: ' + str(mapeia_d_x(converte_bin_dec(lista_string(minimo)))/10000))
+    print('- X: ' + str(mapeia_d_x(converte_bin_dec(lista_string(minimo)))))
     print('Fitness: ' + str(fitness(minimo))) 
 
     print('\nMaximização:')
     print('Indivíduo:')
     print('- Binário: ' + str(lista_string(maximo)))
     print('- Decimal: ' + str(converte_bin_dec(lista_string(maximo))/10000))
-    print('- X: ' + str(mapeia_d_x(converte_bin_dec(lista_string(maximo)))/10000))
+    print('- X: ' + str(mapeia_d_x(converte_bin_dec(lista_string(maximo)))))
     print('Fitness: ' + str(fitness(maximo))) 
 
 if __name__ == "__main__":
