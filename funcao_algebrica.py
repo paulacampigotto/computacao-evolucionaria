@@ -1,56 +1,54 @@
 from pprint import pprint
-from random import uniform, random
+from random import uniform, random, randint
 from math import cos
+from scipy.interpolate import interp1d
 
 ## GLOBAIS
 tam_populacao = 10
-tam_cromossomo = 17
-Li = -2
-Ui = 2
+tam_cromossomo = 16
+Li = -20000
+Ui = 20000
+L = 16
 casas_decimais = 4
 
-def float_to_binary(x, m, n):
-    x_scaled = round(x * 2 ** n)
-    return '{:0{}b}'.format(x_scaled, m + n)
-
-def binary_to_float(bstr, m, n):
-    return int(bstr, 2) / 2 ** n
-
-def string_lista(string):
-    lista = []
-    for i in string:
-        if i == '-':
-            lista.append(i)
-        else:
-            lista.append(int(i))
-    return lista
 
 def lista_string(lista):
     string = ''
     for i in lista:
-        if i == '-':
-            string+=i
-        else:
-            string+=str(i)
+        string+=str(i)
     return string
+
+def mapeia_d_x(d):
+    return Li + ((Ui - Li)/(pow(2,16)-1))*d
+
+def converte_bin_dec(lista_bin):
+    binario = ''
+    for i in lista_bin:
+        binario+=str(i)
+    decimal = int(binario,2)
+    return decimal
+    
 
 def populacao_inicial():
     populacao = []
     for i in range(tam_populacao):
-        valor = round(uniform(Li,Ui),casas_decimais)
-        valor_binario = string_lista(float_to_binary(valor, 2, 13))
-        populacao.append(valor_binario)
+        cromossomo = []
+        for j in range(tam_cromossomo):
+            cromossomo.append(randint(0,1))
+        populacao.append(cromossomo)
     return populacao
         
 
 def fitness(individuo):
-    individuo_string = lista_string(individuo)
-    x = round(binary_to_float(individuo_string, 2, 13),casas_decimais)
+    decimal = converte_bin_dec(individuo)
+    x = mapeia_d_x(decimal)/10000
     return cos(20*x) - (abs(x)/2) + (x*x*x/4)
 
 def main():
 
     populacao = populacao_inicial()
+
+    converte_bin_dec(populacao[0])
 
     populacao.sort(key=fitness)
     (minimo, maximo) = (populacao[0], populacao[-1])
@@ -58,10 +56,17 @@ def main():
     print('População:')
     pprint(populacao)
     print('\nMinimização:')
-    print('Indivíduo: ' + lista_string(minimo)+ ' ou ' + str(round(binary_to_float(lista_string(minimo),2, 13),casas_decimais)))
+    print('Indivíduo:')
+    print('- Binário: ' + str(lista_string(minimo)))
+    print('- Decimal: ' + str(converte_bin_dec(lista_string(minimo))/10000))
+    print('- X: ' + str(mapeia_d_x(converte_bin_dec(lista_string(minimo)))/10000))
     print('Fitness: ' + str(fitness(minimo))) 
+
     print('\nMaximização:')
-    print('Indivíduo: ' + lista_string(maximo)+ ' ou ' + str(round(binary_to_float(lista_string(maximo),2, 13),casas_decimais)))
+    print('Indivíduo:')
+    print('- Binário: ' + str(lista_string(maximo)))
+    print('- Decimal: ' + str(converte_bin_dec(lista_string(maximo))/10000))
+    print('- X: ' + str(mapeia_d_x(converte_bin_dec(lista_string(maximo)))/10000))
     print('Fitness: ' + str(fitness(maximo))) 
 
 if __name__ == "__main__":
