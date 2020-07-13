@@ -52,10 +52,14 @@ def populacao_inicial():
     return populacao
         
 
-def fitness(individuo):
+def fitness_maximizacao(individuo):
     decimal = converte_bin_dec(individuo)
     x = mapeia_d_x(decimal)
     return cos(20*x) - (abs(x)/2) + (x*x*x/4)
+
+
+def fitness_minimizacao(individuo):
+    return fitness_maximizacao(individuo)*-1
 
 def main():
 
@@ -63,8 +67,9 @@ def main():
 
     populacao = populacao_inicial()
 
-    populacao.sort(key=fitness)
-    (minimo, maximo) = (populacao[0], populacao[-1])
+
+    populacao.sort(key=fitness_minimizacao)
+    minimo = populacao[-1]
 
     print('População:')
     pprint(populacao)
@@ -73,14 +78,17 @@ def main():
     print('- Binário: ' + str(lista_string(minimo)))
     print('- Decimal: ' + str(converte_bin_dec(lista_string(minimo))))
     print('- X: ' + str(mapeia_d_x(converte_bin_dec(lista_string(minimo)))))
-    print('Fitness: ' + str(fitness(minimo))) 
+    print('Fitness: ' + str(fitness_minimizacao(minimo))) 
+
+    populacao.sort(key=fitness_maximizacao)
+    maximo = populacao[-1]
 
     print('\nMaximização:')
     print('Indivíduo:')
     print('- Binário: ' + str(lista_string(maximo)))
     print('- Decimal: ' + str(converte_bin_dec(lista_string(maximo))))
     print('- X: ' + str(mapeia_d_x(converte_bin_dec(lista_string(maximo)))))
-    print('Fitness: ' + str(fitness(maximo))) 
+    print('Fitness: ' + str(fitness_maximizacao(maximo))) 
 
 if __name__ == "__main__":
     main()
