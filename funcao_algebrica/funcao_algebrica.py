@@ -71,14 +71,14 @@ def main():
     print('\nMinimização:')
     print('Indivíduo:')
     print('- Binário: ' + str(lista_string(minimo)))
-    print('- Decimal: ' + str(converte_bin_dec(lista_string(minimo))/10000))
+    print('- Decimal: ' + str(converte_bin_dec(lista_string(minimo))))
     print('- X: ' + str(mapeia_d_x(converte_bin_dec(lista_string(minimo)))))
     print('Fitness: ' + str(fitness(minimo))) 
 
     print('\nMaximização:')
     print('Indivíduo:')
     print('- Binário: ' + str(lista_string(maximo)))
-    print('- Decimal: ' + str(converte_bin_dec(lista_string(maximo))/10000))
+    print('- Decimal: ' + str(converte_bin_dec(lista_string(maximo))))
     print('- X: ' + str(mapeia_d_x(converte_bin_dec(lista_string(maximo)))))
     print('Fitness: ' + str(fitness(maximo))) 
 
