@@ -3,32 +3,10 @@ from random import uniform, random, randint
 from math import cos, ceil
 from scipy.interpolate import interp1d
 
-
 ## GLOBAIS
-tam_populacao = 0
-tam_cromossomo = 0
-Li_standard = 0
-Ui_standard = 0
-Li_luxo = 0
-Ui_luxo = 0
-L = 0
-
-
-def leitura():
-    global tam_populacao, tam_cromossomo, Li_standard, Ui_standard, Li_luxo, Ui_luxo, L
-    f = open('entrada.txt', 'r')
-    linhas = f.readlines()
-
-    for i in range(len(linhas)):
-        linhas[i] = linhas[i].split("\n")[0]
-
-    tam_populacao = (int)(linhas[0].split("=")[1])
-    tam_cromossomo = (int)(linhas[1].split("=")[1])
-    Li_standard = (int)((linhas[2].split("=")[1]).split(",")[0].split("[")[1])
-    Ui_standard = (int)((linhas[2].split("=")[1]).split(",")[1].split("]")[0])
-    Li_luxo = (int)((linhas[3].split("=")[1]).split(",")[0].split("[")[1])
-    Ui_luxo = (int)((linhas[3].split("=")[1]).split(",")[1].split("]")[0])
-    L = tam_cromossomo
+tam_populacao = 10
+tam_cromossomo = 10
+L = tam_cromossomo
 
 
 def lista_string(lista):
@@ -38,10 +16,10 @@ def lista_string(lista):
     return string
 
 def mapeia_d_x_standard(d):
-    return ceil(Li_standard + ((Ui_standard - Li_standard)/(pow(2,L/2)-1))*d)
+    return ceil(0 + ((24 - 0)/(pow(2,L/2)-1))*d)
 
 def mapeia_d_x_luxo(d):
-    return ceil(Li_luxo + ((Ui_luxo - Li_luxo)/(pow(2,L/2)-1))*d)
+    return ceil(0 + ((16 - 0)/(pow(2,L/2)-1))*d)
 
 def converte_bin_dec(lista_bin):
     bin_standard = ''
@@ -80,8 +58,6 @@ def fitness(individuo):
     return ((x_standard*30 + x_luxo*40)/1360) - 0.125
 
 def main():
-
-    leitura()
 
     populacao = populacao_inicial()
 

@@ -4,12 +4,26 @@ from math import cos
 from scipy.interpolate import interp1d
 
 ## GLOBAIS
-tam_populacao = 10
-tam_cromossomo = 16
-Li = -20000
-Ui = 20000
-L = 16
+tam_populacao = 0
+tam_cromossomo = 0
+Li = 0
+Ui = 0
+L = 0
 
+
+def leitura():
+    global tam_populacao, tam_cromossomo, Li, Ui, L
+    f = open('entrada.txt', 'r')
+    linhas = f.readlines()
+
+    for i in range(len(linhas)):
+        linhas[i] = linhas[i].split("\n")[0]
+
+    tam_populacao = (int)(linhas[0].split("=")[1])
+    tam_cromossomo = (int)(linhas[1].split("=")[1])
+    Li = (int)((linhas[2].split("=")[1]).split(",")[0].split("[")[1])
+    Ui = (int)((linhas[2].split("=")[1]).split(",")[1].split("]")[0])
+    L = tam_cromossomo
 
 def lista_string(lista):
     string = ''
@@ -44,6 +58,8 @@ def fitness(individuo):
     return cos(20*x) - (abs(x)/2) + (x*x*x/4)
 
 def main():
+
+    leitura()
 
     populacao = populacao_inicial()
 

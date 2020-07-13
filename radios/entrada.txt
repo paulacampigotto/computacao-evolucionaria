@@ -1,0 +1,4 @@
+POP=10
+DIM=10
+Bounds_standard=[0,24]
+Bounds_luxo=[0,16]
