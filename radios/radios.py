@@ -3,10 +3,32 @@ from random import uniform, random, randint
 from math import cos, ceil
 from scipy.interpolate import interp1d
 
+
 ## GLOBAIS
-tam_populacao = 10
-tam_cromossomo = 10
-L = tam_cromossomo
+tam_populacao = 0
+tam_cromossomo = 0
+Li_standard = 0
+Ui_standard = 0
+Li_luxo = 0
+Ui_luxo = 0
+L = 0
+
+
+def leitura():
+    global tam_populacao, tam_cromossomo, Li_standard, Ui_standard, Li_luxo, Ui_luxo, L
+    f = open('entrada.txt', 'r')
+    linhas = f.readlines()
+
+    for i in range(len(linhas)):
+        linhas[i] = linhas[i].split("\n")[0]
+
+    tam_populacao = (int)(linhas[0].split("=")[1])
+    tam_cromossomo = (int)(linhas[1].split("=")[1])
+    Li_standard = (int)((linhas[2].split("=")[1]).split(",")[0].split("[")[1])
+    Ui_standard = (int)((linhas[2].split("=")[1]).split(",")[1].split("]")[0])
+    Li_luxo = (int)((linhas[3].split("=")[1]).split(",")[0].split("[")[1])
+    Ui_luxo = (int)((linhas[3].split("=")[1]).split(",")[1].split("]")[0])
+    L = tam_cromossomo
 
 
 def lista_string(lista):
@@ -16,10 +38,10 @@ def lista_string(lista):
     return string
 
 def mapeia_d_x_standard(d):
-    return ceil(0 + ((24 - 0)/(pow(2,L/2)-1))*d)
+    return ceil(Li_standard + ((Ui_standard - Li_standard)/(pow(2,L/2)-1))*d)
 
 def mapeia_d_x_luxo(d):
-    return ceil(0 + ((16 - 0)/(pow(2,L/2)-1))*d)
+    return ceil(Li_luxo + ((Ui_luxo - Li_luxo)/(pow(2,L/2)-1))*d)
 
 def converte_bin_dec(lista_bin):
     bin_standard = ''
@@ -32,35 +54,29 @@ def converte_bin_dec(lista_bin):
     dec_luxo = int(bin_luxo,2)
     return (dec_standard,dec_luxo)
     
-def verifica_restricao(individuo):
-    standard, luxo = converte_bin_dec(individuo)
-    if standard + (luxo*2) == 40:
-        return True
-    return False
 
 def populacao_inicial():
     populacao = []
     for i in range(tam_populacao):
-        while True:
-            cromossomo = []
-            for j in range(tam_cromossomo):
-                cromossomo.append(randint(0,1))
-            if verifica_restricao(cromossomo):
-                break
+        cromossomo = []
+        for j in range(tam_cromossomo):
+            cromossomo.append(randint(0,1))
         populacao.append(cromossomo)
     return populacao
         
+def penalidade(total_funcionarios):
+    return abs(40-total_funcionarios)/100
 
 def fitness(individuo):
     decimal = converte_bin_dec(individuo)
     x_standard = mapeia_d_x_standard(decimal[0])
     x_luxo = mapeia_d_x_luxo(decimal[1])
-    return ((x_standard*30 + x_luxo*40)/1360) - 0.125
+    return ((x_standard*30 + x_luxo*40)/1360) - penalidade(x_standard+(x_luxo*2))
 
 def main():
 
+    leitura()
     populacao = populacao_inicial()
-
 
     populacao.sort(key=fitness)
     (minimo, maximo) = (populacao[0], populacao[-1])

@@ -32,7 +32,7 @@ def lista_string(lista):
     return string
 
 def mapeia_d_x(d):
-    return (Li + ((Ui - Li)/(pow(2,16)-1))*d)/10000
+    return (Li + ((Ui - Li)/(pow(2,16)-1))*d)
 
 def converte_bin_dec(lista_bin):
     binario = ''
