@@ -1,8 +1,10 @@
 from pprint import pprint
-from random import uniform, random, randint
+from random import uniform, random, randint, choice
 from math import cos
 from scipy.interpolate import interp1d
 import itertools
+import copy
+import matplotlib.pyplot as plt
 from entrada import *
 
 
@@ -14,16 +16,23 @@ class Populacao:
         self.individuos = individuos
         self.melhor = self.melhor_pior_individuo()[0]
         self.pior = self.melhor_pior_individuo()[1]
+        self.somaFitness = self.somafits()
+
+    def somafits(self):
+        soma = 0
+        for i in self.individuos:
+            soma+=i.fitness
+        return soma
 
     def melhor_pior_individuo(self):
         melhorFitness = 0
         piorFitness = 1
         for i in self.individuos:
-            if(i.fitnessMax > melhorFitness):
-                melhorFitness = i.fitnessMax
+            if(i.fitness > melhorFitness):
+                melhorFitness = i.fitness
                 melhorIndividuo = i
-            if(i.fitnessMax < piorFitness):
-                piorFitness = i.fitnessMax
+            if(i.fitness < piorFitness):
+                piorFitness = i.fitness
                 piorIndividuo = i
         if MAXIMIZAR:
             return (melhorIndividuo, piorIndividuo)
@@ -36,10 +45,13 @@ class Populacao:
             print('Binário: ', i.binario)
             print('Decimal: ', i.decimal)
             print('X: ', i.x)
-            print('Fitness max: ', i.fitnessMax)
-            print('Fitness min: ', i.fitnessMin)
+            print('Fitness: ', i.fitness)
             print()
-        
+            
+    def retorna_ind_pelo_cromossomo(self,cromossomo):
+        for ind in self.individuos:
+            if(cromossomo == ind.cromossomo):
+                return ind
                     
 
 class Individuo:
@@ -51,15 +63,18 @@ class Individuo:
         self.binario = self.lista_string(cromossomo)
         self.decimal = self.converte_bin_dec(cromossomo)
         self.x = self.mapeia_d_x(self.decimal)
-        self.fitnessMax = self.fitnessMaxFunc()
-        self.fitnessMin = 1 - self.fitnessMax
+        self.fitness = self.fitnessFunc()
 
     def getId(self):
         return self.id
 
-    def fitnessMaxFunc(self):
-        x = self.xFuncao()
-        return (x+4)/6
+    def fitnessFunc(self):
+        fit = (self.xFuncao()+4)/6
+        if MAXIMIZAR:
+            return fit
+        else:
+            return 1-fit
+            
 
     def xFuncao(self):
         return cos(20*self.x) - (abs(self.x)/2) + (self.x*self.x*self.x/4)
@@ -91,32 +106,151 @@ def populacao_inicial():
     return Populacao(populacao)
         
 
-# def selecao_roleta(populacao):
+def selecao_roleta(populacao):
 
-#     individuos_selecionados = []
-#     soma_fitness = 0
-#     for individuo in populacao:
-#         soma_fitness+=fitness_maximizacao(individuo)
+    individuos_selecionados = []
+    soma_fitness = populacao.somaFitness
 
-#     while True:
-#         for individuo in populacao:
-#             prob = random()
-#             if prob > fitness_maximizacao(individuo)/soma_fitness:
-#                 individuos_selecionados.append(individuo)
-#                 if len(individuos_selecionados) == POP:
-#                     return individuos_selecionados
-    
+    while True:
+        for individuo in populacao.individuos:
+            prob = random()
+            if prob < individuo.fitness/soma_fitness:
+                individuos_selecionados.append(individuo)
+                if len(individuos_selecionados) == POP:
+                    return Populacao(individuos_selecionados)
+
+def selecao_torneio(populacao):
+    global K,KP
+    individuos_selecionados = []
+
+    while True:
+        copia_pop = None
+        copia_pop = Populacao(populacao.individuos.copy())
+        lista = []
+        for i in range(K):
+            individuo = choice(copia_pop.individuos)
+            lista.append(individuo)
+            copia_pop.individuos.remove(individuo)
+        lista_pop = Populacao(lista)
+        prob = random()
+        if(prob <= KP):
+            individuos_selecionados.append(lista_pop.melhor)
+        else:
+            individuos_selecionados.append(lista_pop.pior)
+        if len(individuos_selecionados) == POP:
+            return Populacao(individuos_selecionados)
 
 
-# def selecao_torneio(populacao):
+def crossover(populacao):
+    global PC, TIPO_CROSSOVER
+    novaPop = []
+    individuos = populacao.individuos.copy()
+    while True:
+        pai1 = choice(individuos).cromossomo
+        pai2 = choice(individuos).cromossomo
+        # if(pai1 == pai2):
+        #     for i in individuos:
+        #         print(i.x)
+        #     print()
+        #     continue
+        if random() < PC:
+            filho1 = pai1.copy()
+            filho2 = pai2.copy()
+            if TIPO_CROSSOVER==0: # Uniforme
+                for i in range(len(filho1)):
+                    p = random()
+                    if p < 0.5:
+                        filho1[i] = pai2[i]
+                        filho2[i] = pai1[i]
+            elif TIPO_CROSSOVER==1: ## 1 Pt
+                corte = randint(0,len(filho1)-1)
+                filho1 = pai1[0:corte] + pai2[corte:len(filho1)]
+                filho2 = pai2[0:corte] + pai1[corte:len(filho1)]
+            elif TIPO_CROSSOVER==2: ## 2 Pt
+                corte1 = randint(0,len(filho1)-1)
+                corte2 = randint(corte1+1,len(filho1))
+                filho1 = pai1[0:corte1] + pai2[corte1:corte2] + pai1[corte2:len(filho1)]
+                filho2 = pai2[0:corte1] + pai1[corte1:corte2] + pai2[corte2:len(filho1)]
+            novaPop.append(Individuo(filho1))
+            novaPop.append(Individuo(filho2))
+            if len(novaPop) == POP:
+                return Populacao(novaPop)
 
 
-# def selecao_anel(populacao):
+def mutacao(populacao):
+    global PM
+    novaPop = []
+    individuos=[]
+    for i in populacao.individuos:
+        individuos.append(i.cromossomo)
+    for i in individuos:
+        for bit in range(len(i)):
+            if random() < PM:
+                if(i[bit] == 1):
+                    i[bit] = 0
+                else: i[bit] = 1
+        novaPop.append(Individuo(i))
+    return Populacao(novaPop)
+                
+
+def elitismo(populacao, melhorInd):
+    melhorAtual = populacao.melhor
+    novaPop=[]
+    individuos = []
+    for i in populacao.individuos:
+        individuos.append(i.cromossomo)
+    if(melhorAtual.fitness < melhorInd.fitness):
+        for i in individuos:
+            if(populacao.retorna_ind_pelo_cromossomo(i) == populacao.pior):
+                individuos.remove(i)
+                individuos.append(melhorInd.cromossomo)
+                for i in individuos:
+                    novaPop.append(Individuo(i))
+                return Populacao(novaPop)
+    else:
+        return populacao
+
+ # def selecao_anel(populacao):
+
+
+
 
 def main():
 
+    global MAXIMIZAR, RUN, GEN
+
     populacao = populacao_inicial()
-    populacao.printa()
+    
+    melhor_ex = []
+    for execucao in range(RUN):
+        melhor_it = []
+        for iteracao in range(GEN):
+            melhorInd = populacao.melhor
+            print(execucao, iteracao)
+            melhor_it.append(populacao.melhor.fitness)
+            pop_selecao = selecao_torneio(populacao)
+            pop_crossover = crossover(pop_selecao)
+            pop_mutacao = mutacao(pop_crossover)
+            pop_selecao = selecao_torneio(pop_mutacao)
+            populacao = elitismo(pop_selecao, melhorInd)
+
+        for x in range(len(melhor_it)):
+            if(execucao==0):
+                melhor_ex.append(melhor_it[x])
+            else:
+                melhor_ex[x]+=melhor_it[x]
+
+
+    x = []
+    for i in melhor_ex:
+        x.append(i/RUN)
+
+
+    plt.plot(x)
+    plt.ylabel('Fitness')
+    #plt.xlabel('Gerações')
+    plt.show()
+    plt.savefig('grafico_convergencia.png')
  
     
 

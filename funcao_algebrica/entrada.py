@@ -5,8 +5,8 @@ TIPO_CODIFICACAO = 'BIN'        # BIN, INT, INT-PERM, REAL
 POP=10                          # Tamanho da população
 DIM=16                          # Dimensão, tamanho do cromossomo, L
 L=DIM
-RUN=5                           # Número de execuções
-GEN=5                           # Número de iterações (gerações)
+RUN=100                           # Número de execuções
+GEN=100                           # Número de iterações (gerações)
 MAXIMIZAR=True                  # False para minimizar
 
 #Bounds
@@ -16,10 +16,11 @@ Ui = 2
 ## Seleção
 
 # Roleta
-K=5
-KP=5
 
 # Torneio Estocástico
+K=2
+KP=1
+
 D=5                     # Distância 
 
 
