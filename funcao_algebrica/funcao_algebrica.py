@@ -249,8 +249,8 @@ def main():
     plt.plot(x)
     plt.ylabel('Fitness')
     #plt.xlabel('Gerações')
-    plt.show()
     plt.savefig('grafico_convergencia.png')
+    plt.show()
  
     
 
