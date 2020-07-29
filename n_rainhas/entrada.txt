@@ -1,4 +1,6 @@
-COD=INT-PERM
+COD='INT-PERM'
 POP=15
 DIM=8
 Bounds=[-5,5]
+RUN = 5
+GEN = 5

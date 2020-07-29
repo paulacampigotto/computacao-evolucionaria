@@ -75,27 +75,35 @@ def tabuleiro(vetor):
         print('.\t'*(DIM-1-vetor[i]))
         print()
 
-leitura()
 
-if(COD == 'BIN'):
-    populacao = popBinaria()
-elif(COD == 'INT'):
-    populacao = popInteira()
-elif(COD == 'REAL'):
-    populacao = popReal()
-else:
-    populacao = popInteiraPerm()
+def main():
 
-populacao.sort(key=fitness)
-(pior, melhor) = (populacao[0], populacao[-1])
 
-pprint(populacao)
-print('Pior indivíduo:')
-tabuleiro(pior)
-print('Fitness:' + str(fitness(pior)))
-print('Melhor indivíduo:')
-tabuleiro(melhor)
-print('Fitness:' + str(fitness(melhor)))
+    leitura()
 
-pior_caso = [0,1,2,3,4,5,6,7]
-print(fitness(pior_caso))
+    if(COD == 'BIN'):
+        populacao = popBinaria()
+    elif(COD == 'INT'):
+        populacao = popInteira()
+    elif(COD == 'REAL'):
+        populacao = popReal()
+    else:
+        populacao = popInteiraPerm()
+
+    populacao.sort(key=fitness)
+    (pior, melhor) = (populacao[0], populacao[-1])
+
+    pprint(populacao)
+    print('Pior indivíduo:')
+    tabuleiro(pior)
+    print('Fitness:' + str(fitness(pior)))
+    print('Melhor indivíduo:')
+    tabuleiro(melhor)
+    print('Fitness:' + str(fitness(melhor)))
+
+    pior_caso = [0,1,2,3,4,5,6,7]
+    print(fitness(pior_caso))
+
+
+if __name__ == "__main__":
+    main()
