@@ -276,12 +276,6 @@ def main():
     global MAXIMIZAR, RUN, GEN
 
     populacao = populacao_inicial()
-    populacao.printa()
-    print(populacao.melhor.fitness)
-    a=[]
-    for i in range(DIM):
-        a.append(i)
-    print(Individuo(a).fitness)
 
     crossover(populacao)
     
@@ -289,17 +283,17 @@ def main():
     pior_ex = []
     media_ex = []
     for execucao in range(RUN):
+        populacao = populacao_inicial()
         melhor_it = []
         pior_it = []
         media_it = []
         for iteracao in range(GEN):
             melhorInd = populacao.melhor
-
             melhor_it.append(melhorInd.fitness)
             pior_it.append(populacao.pior.fitness)
-            media_it.append(populacao.somaFitness/GEN)
+            media_it.append(populacao.somaFitness/POP)
 
-            print(execucao, iteracao)
+            print("RUN:",execucao,"  GEN:", iteracao)
 
             pop_selecao = selecao_torneio(populacao)
             pop_crossover = crossover(pop_selecao)
@@ -326,15 +320,14 @@ def main():
         x_pior.append(pior_ex[i]/RUN)
         x_media.append(media_ex[i]/RUN)
 
-    y=[]
-    for i in range(GEN):
-        y.append(i)
-    print(y)
-    plt.plot(x_melhor)
-    plt.plot(x_pior)
-    plt.plot(x_media)
+    plt.plot(range(GEN),x_melhor, label = 'Melhor indivíduo', color = 'blue')
+    plt.plot(range(GEN),x_pior, label = 'Pior indivíduo', color = 'red')
+    plt.plot(range(GEN),x_media, label = 'Média da população', color = 'purple')
+    plt.legend()
     plt.ylabel('Fitness')
-    #plt.xlabel('Gerações')
+    plt.xlabel('Gerações')
+    plt.title('Gráfico de convergência N rainhas')
+    #plt.title('Fitness do melhor indivíduo: ' + str(round(max(x_melhor),2)))
     plt.savefig('grafico_convergencia.png')
     plt.show()
  
