@@ -5,6 +5,7 @@ from scipy.interpolate import interp1d
 import itertools
 import copy
 import matplotlib.pyplot as plt
+from math import ceil
 from entrada import *
 
 
@@ -43,8 +44,12 @@ class Populacao:
         for i in self.individuos:
             print('----- Indivíduo', i.getId(), '-----')
             print('Binário: ', i.binario)
-            print('Decimal: ', i.decimal)
-            print('X: ', i.x)
+            print('## Standard ##')
+            print('Decimal: ', i.decimalStandard)
+            print('X: ', i.xStandard)
+            print('## Luxo ##')
+            print('Decimal: ', i.decimalLuxo)
+            print('X: ', i.xLuxo)
             print('Fitness: ', i.fitness)
             print()
             
@@ -61,39 +66,45 @@ class Individuo:
         self.id = next(Individuo.id)
         self.cromossomo = cromossomo
         self.binario = self.lista_string(cromossomo)
-        self.decimal = self.converte_bin_dec(cromossomo)
-        self.x = self.mapeia_d_x(self.decimal)
+        self.decimalStandard = self.converte_bin_dec(cromossomo)[0]
+        self.decimalLuxo = self.converte_bin_dec(cromossomo)[1]
+        self.xStandard = self.mapeia_d_x_standard(self.decimalStandard)
+        self.xLuxo = self.mapeia_d_x_standard(self.decimalLuxo)
         self.fitness = self.fitnessFunc()
 
     def getId(self):
         return self.id
 
+    def penalidade(self):
+        total_funcionarios = self.xStandard+(self.xLuxo*2)
+        return max(0, total_funcionarios - 40)/16
+
     def fitnessFunc(self):
-        fit = (self.xFuncao()+4)/6
+        fit = (self.xStandard*30 + self.xLuxo*40)/1360 - (1*self.penalidade())
         if MAXIMIZAR:
             return fit
         else:
             return 1-fit
             
-
-    def xFuncao(self):
-        return cos(20*self.x) - (abs(self.x)/2) + (self.x*self.x*self.x/4)
-
     def lista_string(self, lista):
-        string = ''
-        for i in lista:
-            string+=str(i)
-        return string
+        return ''.join(map(str, lista))
 
     def converte_bin_dec(self, lista_bin):
-        binario = ''
-        for i in lista_bin:
-            binario+=str(i)
-        decimal = int(binario,2)
-        return decimal
+        bin_standard = ''
+        bin_luxo = ''
+        for i in lista_bin[:5]:
+            bin_standard+=str(i)
+        for i in lista_bin[5:]:
+            bin_luxo+=str(i)
+        dec_standard = int(bin_standard,2)
+        dec_luxo = int(bin_luxo,2)
+        return (dec_standard,dec_luxo)
 
-    def mapeia_d_x(self,d):
-        return (Li + ((Ui - Li)/(pow(2,16)-1))*d)
+    def mapeia_d_x_standard(self,d):
+        return round(Li_standard + float(Ui_standard - Li_standard)/float(2**L - 1)*d)
+
+    def mapeia_d_x_luxo(self,d):
+        return round(Li_luxo + float(Ui_luxo - Li_luxo)/float(2**L - 1)*d)
     
 
 def populacao_inicial():
@@ -220,21 +231,16 @@ def main():
     global MAXIMIZAR, RUN, GEN
 
     populacao = populacao_inicial()
+
+    populacao.printa()
     
     melhor_ex = []
-    media_ex = []
-    pior_ex = []
     for execucao in range(RUN):
         melhor_it = []
-        media_it = []
-        pior_it = []
         for iteracao in range(GEN):
             melhorInd = populacao.melhor
-            piorInd = populacao.pior
             print(execucao, iteracao)
             melhor_it.append(populacao.melhor.fitness)
-            pior_it.append(populacao.pior.fitness)
-            media_it.append(populacao.somaFitness/POP)
             pop_selecao = selecao_torneio(populacao)
             pop_crossover = crossover(pop_selecao)
             pop_mutacao = mutacao(pop_crossover)
@@ -244,31 +250,18 @@ def main():
         for x in range(len(melhor_it)):
             if(execucao==0):
                 melhor_ex.append(melhor_it[x])
-                pior_ex.append(pior_it[x])
-                media_ex.append(media_it[x])
             else:
                 melhor_ex[x]+=melhor_it[x]
-                pior_ex[x]+=pior_it[x]
-                media_ex[x]+=media_it[x]
 
 
-    melhor=[]
-    pior=[]
-    media=[]
-    for i in range(len(melhor_ex)):
-        melhor.append(melhor_ex[i]/RUN)
-        pior.append(pior_ex[i]/RUN)
-        media.append(media_ex[i]/RUN)
+    x = []
+    for i in melhor_ex:
+        x.append(i/RUN)
 
 
-    plt.plot(range(GEN),melhor, label = 'Melhor indivíduo', color = 'blue')
-    plt.plot(range(GEN),pior, label = 'Pior indivíduo', color = 'red')
-    plt.plot(range(GEN),media, label = 'Média da população', color = 'purple')
-    plt.legend()
+    plt.plot(x)
     plt.ylabel('Fitness')
-    plt.xlabel('Gerações')
-    #plt.title('Gráfico de convergência função algébrica')
-    plt.title('Fitness do melhor indivíduo: ' + str(round(max(melhor),2)))
+    #plt.xlabel('Gerações')
     plt.savefig('grafico_convergencia.png')
     plt.show()
  

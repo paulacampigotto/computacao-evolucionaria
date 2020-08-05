@@ -2,34 +2,7 @@ from pprint import pprint
 from random import uniform, random, randint
 from math import cos, ceil
 from scipy.interpolate import interp1d
-
-
-## GLOBAIS
-tam_populacao = 0
-tam_cromossomo = 0
-Li_standard = 0
-Ui_standard = 0
-Li_luxo = 0
-Ui_luxo = 0
-L = 0
-
-
-def leitura():
-    global tam_populacao, tam_cromossomo, Li_standard, Ui_standard, Li_luxo, Ui_luxo, L
-    f = open('entrada.txt', 'r')
-    linhas = f.readlines()
-
-    for i in range(len(linhas)):
-        linhas[i] = linhas[i].split("\n")[0]
-
-    tam_populacao = (int)(linhas[0].split("=")[1])
-    tam_cromossomo = (int)(linhas[1].split("=")[1])
-    Li_standard = (int)((linhas[2].split("=")[1]).split(",")[0].split("[")[1])
-    Ui_standard = (int)((linhas[2].split("=")[1]).split(",")[1].split("]")[0])
-    Li_luxo = (int)((linhas[3].split("=")[1]).split(",")[0].split("[")[1])
-    Ui_luxo = (int)((linhas[3].split("=")[1]).split(",")[1].split("]")[0])
-    L = tam_cromossomo
-
+from entrada import *
 
 def lista_string(lista):
     string = ''
@@ -57,9 +30,9 @@ def converte_bin_dec(lista_bin):
 
 def populacao_inicial():
     populacao = []
-    for i in range(tam_populacao):
+    for i in range(POP):
         cromossomo = []
-        for j in range(tam_cromossomo):
+        for j in range(DIM):
             cromossomo.append(randint(0,1))
         populacao.append(cromossomo)
     return populacao
@@ -75,7 +48,6 @@ def fitness(individuo):
 
 def main():
 
-    leitura()
     populacao = populacao_inicial()
 
     populacao.sort(key=fitness)

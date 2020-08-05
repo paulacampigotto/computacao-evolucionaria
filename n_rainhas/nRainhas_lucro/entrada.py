@@ -2,11 +2,11 @@
 # Variáveis Globais
 
 TIPO_CODIFICACAO = 'BIN'        # BIN, INT, INT-PERM, REAL
-POP=10                          # Tamanho da população
-DIM=64                         # Dimensão, tamanho do cromossomo, L
+POP=32                         # Tamanho da população
+DIM=64                        # Dimensão, tamanho do cromossomo, L
 L=DIM
-RUN=5                           # Número de execuções
-GEN=1000                           # Número de iterações (gerações)
+RUN=5                         # Número de execuções
+GEN=16000                           # Número de iterações (gerações)
 MAXIMIZAR=True                  # False para minimizar
 
 #Bounds
