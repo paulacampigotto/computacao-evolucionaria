@@ -26,6 +26,8 @@ class Populacao:
         return soma
 
     def melhor_pior_individuo(self):
+        melhorIndividuo = self.individuos[0]
+        piorIndividuo = self.individuos[0]
         melhorFitness = 0
         piorFitness = 1
         for i in self.individuos:
@@ -75,19 +77,17 @@ class Individuo:
     def getId(self):
         return self.id
 
-    def penalidade(self):
-        total_funcionarios = self.xStandard+(self.xLuxo*2)
+    def penalidade(self,total_funcionarios):
         return max(0, total_funcionarios - 40)/16
 
     def fitnessFunc(self):
-        fit = (self.xStandard*30 + self.xLuxo*40)/1360 - (1*self.penalidade())
-        if MAXIMIZAR:
-            return fit
-        else:
-            return 1-fit
+        return (self.xStandard*30 + self.xLuxo*40)/1360 - 1 * self.penalidade(self.xStandard+self.xLuxo*2)
             
     def lista_string(self, lista):
-        return ''.join(map(str, lista))
+        string = ''
+        for i in lista:
+            string+=str(i)
+        return string
 
     def converte_bin_dec(self, lista_bin):
         bin_standard = ''
@@ -101,10 +101,10 @@ class Individuo:
         return (dec_standard,dec_luxo)
 
     def mapeia_d_x_standard(self,d):
-        return round(Li_standard + float(Ui_standard - Li_standard)/float(2**L - 1)*d)
+        return ceil(Li_standard + ((Ui_standard - Li_standard)/(pow(2,L/2)-1))*d)
 
     def mapeia_d_x_luxo(self,d):
-        return round(Li_luxo + float(Ui_luxo - Li_luxo)/float(2**L - 1)*d)
+        return ceil(Li_luxo + ((Ui_luxo - Li_luxo)/(pow(2,L/2)-1))*d)
     
 
 def populacao_inicial():
@@ -232,15 +232,23 @@ def main():
 
     populacao = populacao_inicial()
 
-    populacao.printa()
+
     
     melhor_ex = []
+    pior_ex = []
+    media_ex = []
     for execucao in range(RUN):
         melhor_it = []
+        pior_it = []
+        media_it = []
         for iteracao in range(GEN):
             melhorInd = populacao.melhor
-            print(execucao, iteracao)
-            melhor_it.append(populacao.melhor.fitness)
+            melhor_it.append(melhorInd.fitness)
+            pior_it.append(populacao.pior.fitness)
+            media_it.append(populacao.somaFitness/POP)
+
+            print("RUN:",execucao,"  GEN:", iteracao)
+
             pop_selecao = selecao_torneio(populacao)
             pop_crossover = crossover(pop_selecao)
             pop_mutacao = mutacao(pop_crossover)
@@ -250,18 +258,43 @@ def main():
         for x in range(len(melhor_it)):
             if(execucao==0):
                 melhor_ex.append(melhor_it[x])
+                pior_ex.append(pior_it[x])
+                media_ex.append(media_it[x])
             else:
                 melhor_ex[x]+=melhor_it[x]
+                pior_ex[x]+=pior_it[x]
+                media_ex[x]+=media_it[x]
 
+    i = melhorInd
+    print()
+    print('Melhor individuo:')
+    print('Binário: ', i.cromossomo)
+    print('Fitness: ', i.fitness)
+    print()
+    print('-> Standard ')
+    print('Decimal:', i.decimalStandard)
+    print('X:', i.xStandard)
+    print()
+    print('-> Luxo ')
+    print('Decimal:', i.decimalLuxo)
+    print('X:', i.xLuxo)
 
-    x = []
-    for i in melhor_ex:
-        x.append(i/RUN)
+    x_melhor = []
+    x_pior = []
+    x_media = []
+    for i in range(GEN):
+        x_melhor.append(melhor_ex[i]/RUN)
+        x_pior.append(pior_ex[i]/RUN)
+        x_media.append(media_ex[i]/RUN)
 
-
-    plt.plot(x)
+    plt.plot(range(GEN),x_melhor, label = 'Melhor indivíduo', color = 'blue')
+    plt.plot(range(GEN),x_pior, label = 'Pior indivíduo', color = 'red')
+    plt.plot(range(GEN),x_media, label = 'Média da população', color = 'purple')
+    plt.legend()
     plt.ylabel('Fitness')
-    #plt.xlabel('Gerações')
+    plt.xlabel('Gerações')
+    plt.title('Gráfico de convergência radios')
+    #plt.title('Fitness do melhor indivíduo: ' + str(round(max(x_melhor),2)))
     plt.savefig('grafico_convergencia.png')
     plt.show()
  

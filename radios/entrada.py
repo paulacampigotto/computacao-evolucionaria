@@ -3,11 +3,11 @@
 
 
 TIPO_CODIFICACAO = 'BIN'        # BIN, INT, INT-PERM, REAL
-POP=10                          # Tamanho da população
-DIM=16                          # Dimensão, tamanho do cromossomo, L
+POP=100                         # Tamanho da população
+DIM=10                          # Dimensão, tamanho do cromossomo, L
 L=DIM
-RUN=200                           # Número de execuções
-GEN=100                           # Número de iterações (gerações)
+RUN=10                           # Número de execuções
+GEN=100                         # Número de iterações (gerações)
 MAXIMIZAR=True                  # False para minimizar
 
 #Bounds
