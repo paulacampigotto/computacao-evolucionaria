@@ -7,6 +7,7 @@ import copy
 import matplotlib.pyplot as plt
 import numpy as np
 from entrada import *
+import math
 
 
 class Populacao:
@@ -59,12 +60,13 @@ class Individuo:
     def __init__(self, cromossomo):
         self.id = next(Individuo.id)
         self.cromossomo = cromossomo
+        self.colisoes = self.colisoesFunc()
         self.fitness = self.fitnessFunc()
 
     def getId(self):
         return self.id
 
-    def fitnessFunc(self):
+    def colisoesFunc(self):
         colisoes = 0
         vetor = self.cromossomo
         for i in range(DIM):
@@ -79,7 +81,11 @@ class Individuo:
                     break
             if ok:
                 colisoes+=1
-        return (DIM*(DIM-colisoes))/(DIM*DIM) 
+        return colisoes
+
+
+    def fitnessFunc(self):
+        return (DIM*(DIM-self.colisoes))/(DIM*DIM) 
 
     def printaTabuleiro(self):
         vetor = self.cromossomo
@@ -101,6 +107,10 @@ def populacao_inicial():
         populacao.append(Individuo(cromossomo))
     return Populacao(populacao)
         
+def selecao(populacao):
+    if(TIPO_SELECAO == 0):
+        return selecao_roleta(populacao)
+    return selecao_torneio(populacao)
 
 def selecao_roleta(populacao):
 
@@ -268,39 +278,62 @@ def elitismo(populacao, melhorInd):
 
  # def selecao_anel(populacao):
 
+def desvio_padrao(lista):
+    n = len(lista)
+    media = sum(lista) / n
+    cont = 0
+    for i in lista:
+        cont += (abs(i - media)) ** 2
+    cont /= n
+    cont = math.sqrt(cont)
+    return cont
 
-
+def media(lista):
+    n = len(lista)
+    cont = 0
+    for i in lista:
+        cont+=i
+    return cont/n
 
 def main():
 
     global MAXIMIZAR, RUN, GEN
 
     populacao = populacao_inicial()
+    melhorInd = populacao.melhor
+    melhor_execucao = []
+    melhor_execucao_colisao = []
 
-    crossover(populacao)
-    
     melhor_ex = []
     pior_ex = []
     media_ex = []
+    
+
     for execucao in range(RUN):
         populacao = populacao_inicial()
+
         melhor_it = []
         pior_it = []
         media_it = []
+
         for iteracao in range(GEN):
-            melhorInd = populacao.melhor
-            melhor_it.append(melhorInd.fitness)
+            if(populacao.melhor.fitness > melhorInd.fitness):
+                melhorInd = populacao.melhor
+            melhor_it.append(populacao.melhor.fitness)
             pior_it.append(populacao.pior.fitness)
             media_it.append(populacao.somaFitness/POP)
 
             print("RUN:",execucao,"  GEN:", iteracao)
 
-            pop_selecao = selecao_torneio(populacao)
+            pop_selecao = selecao(populacao)
             pop_crossover = crossover(pop_selecao)
             pop_mutacao = mutacao(pop_crossover)
-            pop_selecao = selecao_torneio(pop_mutacao)
-            populacao = elitismo(pop_selecao, melhorInd)
-
+            pop_selecao = selecao(pop_mutacao)
+            populacao = elitismo(pop_selecao, populacao.melhor)
+            if(iteracao == GEN-1):
+                melhor_execucao_colisao.append(populacao.melhor.colisoes)
+            
+        melhor_execucao.append(melhor_it[GEN-1])
         for x in range(len(melhor_it)):
             if(execucao==0):
                 melhor_ex.append(melhor_it[x])
@@ -312,6 +345,7 @@ def main():
                 media_ex[x]+=media_it[x]
 
 
+
     x_melhor = []
     x_pior = []
     x_media = []
@@ -319,6 +353,16 @@ def main():
         x_melhor.append(melhor_ex[i]/RUN)
         x_pior.append(pior_ex[i]/RUN)
         x_media.append(media_ex[i]/RUN)
+
+    
+    print('Melhor individuo:')
+    print('Cromossomo: ',melhorInd.cromossomo)
+    print('Fitness: ',melhorInd.fitness)
+    print('Média do melhor indivíduo por execução: ', media(melhor_execucao))
+    print('Desvio padrão do melhor indivíduo por execução: ', desvio_padrao(melhor_execucao))
+    print('Média de colisoes do melhor indivíduo por execução: ', media(melhor_execucao_colisao))
+    print('Desvio padrão de colisoes do melhor indivíduo por execução: ', desvio_padrao(melhor_execucao_colisao))
+    print(melhor_execucao_colisao)
 
     plt.plot(range(GEN),x_melhor, label = 'Melhor indivíduo', color = 'blue')
     plt.plot(range(GEN),x_pior, label = 'Pior indivíduo', color = 'red')
@@ -333,5 +377,7 @@ def main():
  
     
 
+
+ 
 if __name__ == "__main__":
     main()

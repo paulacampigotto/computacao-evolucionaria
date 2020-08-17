@@ -3,10 +3,10 @@
 
 TIPO_CODIFICACAO = 'BIN'        # BIN, INT, INT-PERM, REAL
 POP=10                          # Tamanho da população
-DIM=64                         # Dimensão, tamanho do cromossomo, L
+DIM=30                         # Dimensão, tamanho do cromossomo, L
 L=DIM
 RUN=5                           # Número de execuções
-GEN=1000                           # Número de iterações (gerações)
+GEN=500                           # Número de iterações (gerações)
 MAXIMIZAR=True                  # False para minimizar
 
 #Bounds
@@ -33,7 +33,7 @@ OPCAO_ELITISMO=0        # 0 -> Booleano             1 -> Preservar melhor indiv�
 
 PC=0.9                  # probabilidade de crossover
 TIPO_CROSSOVER=3        # 0 -> Uniforme      1 -> Um ponto   2 -> 2 pontos    3 -> PMX     4 -> BLX-a      5 -> Aritmético
-
+TIPO_SELECAO=1          # 0 -> roleta        1 -> Torneio
 PM=0.02                 # probabilidade de mutação
 
 

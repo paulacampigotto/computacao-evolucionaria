@@ -1,0 +1,7 @@
+Melhor individuo:
+Cromossomo: [4, 1, 3, 6, 2, 7, 5, 0]
+Colisoes: 0.0
+Lucro: 26.262521328760997
+Fitness: 0.7271713289164157
+Média do melhor indivíduo das execuções: 0.6647349036421002
+Desvio padrão do melhor indivíduo das execuções: 0.076367292790329

@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from entrada import *
 import math
+import statistics
 
 
 class Populacao:
@@ -301,6 +302,16 @@ def gera_matriz():
             cont+=1
     return matriz
 
+def desvio_padrao(lista):
+    n = len(lista)
+    media = sum(lista) / n
+    cont = 0
+    for i in lista:
+        cont += (abs(i - media)) ** 2
+    cont /= n
+    cont = math.sqrt(cont)
+    return cont
+    
 
 def main():
 
@@ -311,22 +322,24 @@ def main():
     matriz_lucro = gera_matriz()
 
     populacao = populacao_inicial()
+    melhor_execucao = []
+    melhor_execucao_lucro = []
+    melhorInd = populacao.melhor
 
-    populacao.printa()
-
-    crossover(populacao)
-    
     melhor_ex = []
     pior_ex = []
     media_ex = []
+
     for execucao in range(RUN):
         populacao = populacao_inicial()
         melhor_it = []
         pior_it = []
         media_it = []
         for iteracao in range(GEN):
-            melhorInd = populacao.melhor
-            melhor_it.append(melhorInd.fitness)
+            if(populacao.melhor.fitness > melhorInd.fitness):
+                melhorInd = populacao.melhor
+
+            melhor_it.append(populacao.melhor.fitness)
             pior_it.append(populacao.pior.fitness)
             media_it.append(populacao.somaFitness/POP)
 
@@ -336,7 +349,10 @@ def main():
             pop_crossover = crossover(pop_selecao)
             pop_mutacao = mutacao(pop_crossover)
             pop_selecao = selecao_torneio(pop_mutacao)
-            populacao = elitismo(pop_selecao, melhorInd)
+            populacao = elitismo(pop_selecao, populacao.melhor)
+            if(iteracao == GEN-1):
+                melhor_execucao_lucro.append(populacao.melhor.lucro)
+        melhor_execucao.append(melhor_it[GEN-1])
 
         for x in range(len(melhor_it)):
             if(execucao==0):
@@ -348,11 +364,22 @@ def main():
                 pior_ex[x]+=pior_it[x]
                 media_ex[x]+=media_it[x]
 
+    f=open('resultados.txt', "w+")
+    f.write('Melhor individuo:\nCromossomo: ' + str(melhorInd.cromossomo) + '\nColisoes: ' + str(1-melhorInd.colisoes) + '\nLucro: ' + str(melhorInd.lucro)
+    + '\nFitness: ' + str(melhorInd.fitness) + '\nMédia do melhor indivíduo das execuções: ' + str(sum(melhor_execucao)/len(melhor_execucao))
+    + '\nDesvio padrão do melhor indivíduo das execuções: ' + str(desvio_padrao(melhor_execucao)))
+    f.close()
+
     print('Melhor individuo:')
     print('Cromossomo: ',melhorInd.cromossomo)
-    print('Colisoes: 1 -',melhorInd.colisoes)
+    print('Colisoes: ',1-melhorInd.colisoes)
     print('Lucro: ',melhorInd.lucro)
     print('Fitness: ',melhorInd.fitness)
+    print('Média do melhor indivíduo das execuções: ',sum(melhor_execucao)/len(melhor_execucao))
+    print('Desvio padrão do melhor indivíduo das execuções: ',desvio_padrao(melhor_execucao))
+    print()
+    print('Média do lucro do melhor indivíduo das execuções: ',sum(melhor_execucao_lucro)/len(melhor_execucao_lucro))
+    print('Desvio padrão do lucro do melhor indivíduo das execuções: ',desvio_padrao(melhor_execucao_lucro))
 
 
     x_melhor = []
@@ -367,15 +394,16 @@ def main():
     plt.plot(range(GEN),x_melhor, label = 'Melhor indivíduo', color = 'blue')
     plt.plot(range(GEN),x_pior, label = 'Pior indivíduo', color = 'red')
     plt.plot(range(GEN),x_media, label = 'Média da população', color = 'purple')
+    plt.axhline(y=sum(melhor_execucao)/len(melhor_execucao), color='g', linestyle='-', label='Média do melhor indivíduo das execuções')
     plt.legend()
     plt.ylabel('Fitness')
-    #plt.xlabel('Gerações')
-    plt.title('Gráfico de convergência N rainhas')
+    plt.xlabel('Gerações')
+    #plt.title('Gráfico de convergência N rainhas')
     plt.title('Fitness do melhor indivíduo: ' + str(round(max(x_melhor),4)))
     plt.savefig('grafico_convergencia.png')
     plt.show()
  
-    
+
 
 if __name__ == "__main__":
     main()

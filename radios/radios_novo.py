@@ -7,6 +7,7 @@ import copy
 import matplotlib.pyplot as plt
 from math import ceil
 from entrada import *
+import math
 
 
 class Populacao:
@@ -223,7 +224,15 @@ def elitismo(populacao, melhorInd):
 
  # def selecao_anel(populacao):
 
-
+def desvio_padrao(lista):
+    n = len(lista)
+    media = sum(lista) / n
+    cont = 0
+    for i in lista:
+        cont += (abs(i - media)) ** 2
+    cont /= n
+    cont = math.sqrt(cont)
+    return cont
 
 
 def main():
@@ -232,7 +241,10 @@ def main():
 
     populacao = populacao_inicial()
 
+    melhorInd=populacao.melhor
 
+    melhor_execucao = []
+    melhor_execucao_lucro = []
     
     melhor_ex = []
     pior_ex = []
@@ -242,8 +254,9 @@ def main():
         pior_it = []
         media_it = []
         for iteracao in range(GEN):
-            melhorInd = populacao.melhor
-            melhor_it.append(melhorInd.fitness)
+            if(populacao.melhor.fitness > melhorInd.fitness):
+                melhorInd = populacao.melhor
+            melhor_it.append(populacao.melhor.fitness)
             pior_it.append(populacao.pior.fitness)
             media_it.append(populacao.somaFitness/POP)
 
@@ -253,8 +266,10 @@ def main():
             pop_crossover = crossover(pop_selecao)
             pop_mutacao = mutacao(pop_crossover)
             pop_selecao = selecao_torneio(pop_mutacao)
-            populacao = elitismo(pop_selecao, melhorInd)
-
+            populacao = elitismo(pop_selecao, populacao.melhor)
+            if(iteracao == GEN-1):
+                melhor_execucao_lucro.append(populacao.melhor.xStandard*30 + populacao.melhor.xLuxo*40)
+        melhor_execucao.append(melhor_it[GEN-1])
         for x in range(len(melhor_it)):
             if(execucao==0):
                 melhor_ex.append(melhor_it[x])
@@ -278,6 +293,19 @@ def main():
     print('-> Luxo ')
     print('Decimal:', i.decimalLuxo)
     print('X:', i.xLuxo)
+    print()
+    print('Função objetivo: ', i.xStandard*30 + i.xLuxo*40)
+    print()
+    print('Média do melhor indivíduo das execuções: ',sum(melhor_execucao)/len(melhor_execucao))
+    print('Desvio padrão do melhor indivíduo das execuções: ',desvio_padrao(melhor_execucao))
+    print()
+    print('Média do lucro do melhor indivíduo das execuções: ',sum(melhor_execucao_lucro)/len(melhor_execucao_lucro))
+    print('Desvio padrão do lucro do melhor indivíduo das execuções: ',desvio_padrao(melhor_execucao_lucro))
+    print()
+    if(i.xStandard > 24 or i.xLuxo > 32):
+        print('Solução inválida')
+    else:
+        print('Solução válida')
 
     x_melhor = []
     x_pior = []
