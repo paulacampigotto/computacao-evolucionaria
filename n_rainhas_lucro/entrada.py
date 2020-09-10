@@ -3,7 +3,7 @@
 
 TIPO_CODIFICACAO = 'INT-PERM'        # BIN, INT, INT-PERM, REAL
 POP=10                        # Tamanho da população
-DIM=8                        # Dimensão, tamanho do cromossomo, L
+DIM=64                        # Dimensão, tamanho do cromossomo, L
 L=DIM
 RUN=5                         # Número de execuções
 GEN=500                           # Número de iterações (gerações)
