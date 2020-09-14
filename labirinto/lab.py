@@ -38,6 +38,11 @@ def updateBoard(gameDisplay):
         for j in range(1,width+1):
             if (i-1, j-1) in getPositions(population[0]):
                 pygame.draw.rect(gameDisplay, pink, [size*j,size*i,size,size])
+            if maze[i-1][j-1] == 2:
+                pygame.draw.rect(gameDisplay, green, [size*j,size*i,size,size])
+            if maze[i-1][j-1] == 3:
+                pygame.draw.rect(gameDisplay, red, [size*j,size*i,size,size])
+            pygame.draw.rect(gameDisplay, black, [size*j,size*i,size,size],1)
 
     pygame.display.update()
 
@@ -61,14 +66,14 @@ def generateRandomPopulation():
                     actualColumn-=1
                     lastDirection = cell
                     break
-                if cell == '↑' and maze[actualLine+1][actualColumn] != 0 and (lastDirection != '↓' or (maze[actualLine-1][actualColumn] == 0 and maze[actualLine][actualColumn+1] == 0 and maze[actualLine][actualColumn-1] == 0)):
-                    ch.append(cell)
-                    actualLine+=1
-                    lastDirection = cell
-                    break
-                if cell == '↓' and maze[actualLine-1][actualColumn] != 0 and (lastDirection != '↑' or (maze[actualLine+1][actualColumn] == 0 and maze[actualLine][actualColumn-1] == 0 and maze[actualLine][actualColumn+1] == 0)):
+                if cell == '↑' and maze[actualLine-1][actualColumn] != 0 and (lastDirection != '↓' or (maze[actualLine+1][actualColumn] == 0 and maze[actualLine][actualColumn-1] == 0 and maze[actualLine][actualColumn+1] == 0)):
                     ch.append(cell)
                     actualLine-=1
+                    lastDirection = cell
+                    break
+                if cell == '↓' and maze[actualLine+1][actualColumn] != 0 and (lastDirection != '↑' or (maze[actualLine-1][actualColumn] == 0 and maze[actualLine][actualColumn+1] == 0 and maze[actualLine][actualColumn-1] == 0)):
+                    ch.append(cell)
+                    actualLine+=1
                     lastDirection = cell
                     break
         pop.append(ch)
@@ -79,7 +84,7 @@ def getPositions(chrom):
     positions = []
     line = 10
     column = 1
-    positions.append((line,column))
+    #positions.append((line,column))
     for i in chrom:
         if i == '→':
             positions.append((line, column+1))
@@ -88,11 +93,11 @@ def getPositions(chrom):
             positions.append((line, column-1))
             column-=1
         elif i == '↑':
-            positions.append((line+1, column))
-            line+=1
-        elif i == '↓':
             positions.append((line-1, column))
             line-=1
+        elif i == '↓':
+            positions.append((line+1, column))
+            line+=1
     return positions
 
 def pprint(vector):
@@ -107,24 +112,23 @@ def main():
 
     domain = ['→','←','↑','↓']
 
-    populationSize = 1
+    populationSize = 5
     dimension = 100
     chrom = []
-
     maze = generateMaze()
-
-    population = generateRandomPopulation()
-    print(population[0])
-    #pprint(getPositions(population[0]))
-   
     size = 25
     height = 30
     width = 25
-    white,black,red,green,pink = (255,255,255),(0,0,0),(255,0,0),(0,255,0),(252,97,154)
+    white,black,red,green,pink = (255,255,255),(0,0,0),(255,0,0),(0,255,0),(255,0,144)
     gameDisplay = pygame.display.set_mode((700,800))
     pygame.display.set_caption("Labirinto")
     gameDisplay.fill(white)
     end = False
+
+
+    population = generateRandomPopulation()
+    pprint(population)
+   # print(getPositions(population[0]))
     
     mazeBoard(gameDisplay)
 
