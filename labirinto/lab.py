@@ -19,7 +19,6 @@ def generateMaze():
 
     return maze
 
-
 def mazeBoard(gameDisplay):
     for i in range(1, height + 1):
         for j in range(1, width + 1):
