@@ -127,7 +127,6 @@ def generateRandomPopulation():
         pop.append(ch)
     return pop
 
-
 def getPositions(chrom):
     positions = []
     line = 10
@@ -148,11 +147,9 @@ def getPositions(chrom):
             line += 1
     return positions
 
-
 def pprint(vector):
     for i in vector:
         print(i)
-
 
 def main():
 
